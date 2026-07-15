@@ -1,65 +1,69 @@
-(function () {
-  const NAMESPACE = "shashwat-bulusu";
-  const KEY = "pinocchio-presaves";
-  const GET_URL = `https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`;
-  const HIT_URL = `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
-  const STORAGE_FLAG = "pinocchio-presaved";
-  const STORAGE_FALLBACK_COUNT = "pinocchio-fallback-count";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const counterEl = document.getElementById("counterNumber");
-  const btnEl = document.getElementById("presaveBtn");
-  const captionEl = document.getElementById("portraitCaption");
+const firebaseConfig = {
+  apiKey: "AIzaSyDTuVeqbuCWdfsrLVFLwo6Uc7lpR4_8nPk",
+  authDomain: "pinocchio-presave.firebaseapp.com",
+  projectId: "pinocchio-presave",
+  storageBucket: "pinocchio-presave.firebasestorage.app",
+  messagingSenderId: "548788426577",
+  appId: "1:548788426577:web:66c2769812c5a3f95de570",
+};
 
-  function renderCount(count) {
-    counterEl.textContent = count.toLocaleString();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const counterRef = doc(db, "counters", "pinocchio-presaves");
+
+const STORAGE_FLAG = "pinocchio-presaved";
+
+const counterEl = document.getElementById("counterNumber");
+const btnEl = document.getElementById("presaveBtn");
+const captionEl = document.getElementById("portraitCaption");
+
+function renderCount(count) {
+  counterEl.textContent = count.toLocaleString();
+}
+
+async function loadCount() {
+  try {
+    const snap = await getDoc(counterRef);
+    renderCount(snap.exists() ? snap.data().count : 0);
+  } catch (err) {
+    console.error("Failed to load presave count", err);
   }
+}
 
-  function fallbackCount() {
-    return parseInt(localStorage.getItem(STORAGE_FALLBACK_COUNT) || "0", 10);
+async function registerPresave() {
+  try {
+    await updateDoc(counterRef, { count: increment(1) });
+    const snap = await getDoc(counterRef);
+    renderCount(snap.data().count);
+  } catch (err) {
+    console.error("Failed to register presave", err);
   }
+}
 
-  function setFallbackCount(n) {
-    localStorage.setItem(STORAGE_FALLBACK_COUNT, String(n));
-  }
+function markPresaved() {
+  localStorage.setItem(STORAGE_FLAG, "true");
+  btnEl.dataset.presaved = "true";
+  btnEl.textContent = "Pre-Saved";
+  captionEl.classList.add("is-visible");
+}
 
-  async function loadCount() {
-    try {
-      const res = await fetch(GET_URL);
-      const data = await res.json();
-      renderCount(data.value || 0);
-    } catch (err) {
-      renderCount(fallbackCount());
-    }
-  }
+if (localStorage.getItem(STORAGE_FLAG) === "true") {
+  markPresaved();
+}
 
-  async function registerPresave() {
-    try {
-      const res = await fetch(HIT_URL);
-      const data = await res.json();
-      renderCount(data.value);
-    } catch (err) {
-      const next = fallbackCount() + 1;
-      setFallbackCount(next);
-      renderCount(next);
-    }
-  }
+btnEl.addEventListener("click", function () {
+  if (localStorage.getItem(STORAGE_FLAG) === "true") return;
+  markPresaved();
+  registerPresave();
+});
 
-  function markPresaved() {
-    localStorage.setItem(STORAGE_FLAG, "true");
-    btnEl.dataset.presaved = "true";
-    btnEl.textContent = "Pre-Saved";
-    captionEl.classList.add("is-visible");
-  }
-
-  if (localStorage.getItem(STORAGE_FLAG) === "true") {
-    markPresaved();
-  }
-
-  btnEl.addEventListener("click", function () {
-    if (localStorage.getItem(STORAGE_FLAG) === "true") return;
-    markPresaved();
-    registerPresave();
-  });
-
-  loadCount();
-})();
+loadCount();
