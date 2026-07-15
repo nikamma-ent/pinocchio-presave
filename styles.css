@@ -144,7 +144,7 @@ html, body {
 }
 
 .socials {
-  margin-top: clamp(8px, 2vh, 24px);
+  margin-top: clamp(8px, 1.5vw, 20px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,8 +163,8 @@ html, body {
 }
 
 .socials img {
-  width: clamp(18px, 2.8vh, 26px);
-  height: clamp(18px, 2.8vh, 26px);
+  width: clamp(18px, 4vw, 24px);
+  height: clamp(18px, 4vw, 24px);
   display: block;
   user-select: none;
   -webkit-user-drag: none;
