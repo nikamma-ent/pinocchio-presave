@@ -25,6 +25,10 @@ const STORAGE_FLAG = "pinocchio-presaved";
 const counterEl = document.getElementById("counterNumber");
 const btnEl = document.getElementById("presaveBtn");
 const captionEl = document.getElementById("portraitCaption");
+const modalOverlay = document.getElementById("modalOverlay");
+const modalClose = document.getElementById("modalClose");
+const modalSpotify = document.getElementById("modalSpotify");
+const modalAppleMusic = document.getElementById("modalAppleMusic");
 
 function renderCount(count) {
   counterEl.textContent = count.toLocaleString();
@@ -56,14 +60,41 @@ function markPresaved() {
   captionEl.classList.add("is-visible");
 }
 
+function openModal() {
+  modalOverlay.classList.add("is-open");
+}
+
+function closeModal() {
+  modalOverlay.classList.remove("is-open");
+}
+
+function choosePlatform() {
+  if (localStorage.getItem(STORAGE_FLAG) === "true") return;
+  markPresaved();
+  registerPresave();
+  closeModal();
+}
+
 if (localStorage.getItem(STORAGE_FLAG) === "true") {
   markPresaved();
 }
 
 btnEl.addEventListener("click", function () {
   if (localStorage.getItem(STORAGE_FLAG) === "true") return;
-  markPresaved();
-  registerPresave();
+  openModal();
+});
+
+modalClose.addEventListener("click", closeModal);
+
+modalOverlay.addEventListener("click", function (e) {
+  if (e.target === modalOverlay) closeModal();
+});
+
+modalSpotify.addEventListener("click", choosePlatform);
+modalAppleMusic.addEventListener("click", choosePlatform);
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") closeModal();
 });
 
 loadCount();
