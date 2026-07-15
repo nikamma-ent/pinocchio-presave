@@ -142,3 +142,30 @@ html, body {
 .preorder-btn:active {
   transform: translateY(0);
 }
+
+.socials {
+  margin-top: clamp(8px, 2vh, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2.5vw, 20px);
+}
+
+.socials a {
+  display: flex;
+  opacity: 0.8;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.socials a:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.socials img {
+  width: clamp(18px, 2.8vh, 26px);
+  height: clamp(18px, 2.8vh, 26px);
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
