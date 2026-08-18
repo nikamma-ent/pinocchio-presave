@@ -422,6 +422,31 @@ What lie did you tell to survive?">
             letter-spacing: 2px;
         }
 
+        .audio-toggle {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 20;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(101, 0, 0, 0.6);
+            border: 1px solid rgba(0, 170, 0, 0.35);
+            color: var(--cream-dim);
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s;
+        }
+
+        .audio-toggle:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
         .socials {
             margin-top: 24px;
             display: flex;
@@ -454,6 +479,9 @@ What lie did you tell to survive?">
     </style>
 </head>
 <body>
+
+<audio id="bgAudio" src="photographs.m4a" loop preload="auto"></audio>
+<button id="audioToggle" class="audio-toggle" type="button" aria-label="Toggle music">🔇</button>
 
 <div class="ahs" role="presentation" aria-hidden="true">AhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhsAhs</div>
 
@@ -707,6 +735,46 @@ What lie did you tell to survive?">
     window.submitConfession = submitConfession;
 
     loadConfessions();
+</script>
+
+<script>
+    (function () {
+        const audio = document.getElementById('bgAudio');
+        const toggle = document.getElementById('audioToggle');
+        let unlocked = false;
+
+        function updateIcon() {
+            toggle.textContent = (audio.muted || audio.paused) ? '🔇' : '🔊';
+        }
+
+        audio.muted = true;
+        audio.play().catch(() => {});
+        updateIcon();
+
+        function unlockOnFirstInteraction() {
+            if (unlocked) return;
+            unlocked = true;
+            audio.muted = false;
+            audio.play().catch(() => {});
+            updateIcon();
+            document.removeEventListener('click', unlockOnFirstInteraction);
+            document.removeEventListener('touchstart', unlockOnFirstInteraction);
+            document.removeEventListener('keydown', unlockOnFirstInteraction);
+        }
+        document.addEventListener('click', unlockOnFirstInteraction);
+        document.addEventListener('touchstart', unlockOnFirstInteraction);
+        document.addEventListener('keydown', unlockOnFirstInteraction);
+
+        toggle.addEventListener('click', () => {
+            if (audio.muted || audio.paused) {
+                audio.muted = false;
+                audio.play().catch(() => {});
+            } else {
+                audio.muted = true;
+            }
+            updateIcon();
+        });
+    })();
 </script>
 </body>
 </html>
